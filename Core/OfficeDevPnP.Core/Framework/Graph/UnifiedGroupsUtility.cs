@@ -189,7 +189,6 @@ namespace OfficeDevPnP.Core.Framework.Graph
                         };
                     }
 
-
                     if (owners != null && owners.Length > 0)
                     {
                         var users = GetUsers(graphClient, owners);
