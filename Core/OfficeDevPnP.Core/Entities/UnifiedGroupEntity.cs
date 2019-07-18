@@ -43,5 +43,9 @@ namespace OfficeDevPnP.Core.Entities
         /// Visibility of the Office 365 group
         /// </summary>
         public String Visibility { get; set; }
+        /// <summary>
+        /// Preferred data location of the Office 365 group
+        /// </summary>
+        public String PreferredDataLocation { get; set; }
     }
 }

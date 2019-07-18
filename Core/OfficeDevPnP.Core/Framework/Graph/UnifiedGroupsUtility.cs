@@ -121,10 +121,11 @@ namespace OfficeDevPnP.Core.Framework.Graph
         /// <param name="createTeam">Defines whether to create MS Teams team associated with the group</param>
         /// <param name="retryCount">Number of times to retry the request in case of throttling</param>
         /// <param name="delay">Milliseconds to wait before retrying the request. The delay will be increased (doubled) every retry</param>
+        /// <param name="preferredDataLocation">Defines Preferred Data Location for the Office 365 Group</param>
         /// <returns>The just created Office 365 Group</returns>
         public static UnifiedGroupEntity CreateUnifiedGroup(string displayName, string description, string mailNickname,
             string accessToken, string[] owners = null, string[] members = null, Stream groupLogo = null,
-            bool isPrivate = false, bool createTeam = false, int retryCount = 10, int delay = 500)
+            bool isPrivate = false, bool createTeam = false, int retryCount = 10, int delay = 500, string preferredDataLocation = "")
         {
             UnifiedGroupEntity result = null;
 
@@ -158,16 +159,36 @@ namespace OfficeDevPnP.Core.Framework.Graph
                     var graphClient = CreateGraphClient(accessToken, retryCount, delay);
 
                     // Prepare the group resource object
-                    var newGroup = new GroupExtended
+                    GroupExtended newGroup = null;
+
+                    if (!string.IsNullOrEmpty(preferredDataLocation))
                     {
-                        DisplayName = displayName,
-                        Description = description,
-                        MailNickname = mailNickname,
-                        MailEnabled = true,
-                        SecurityEnabled = false,
-                        Visibility = isPrivate == true ? "Private" : "Public",
-                        GroupTypes = new List<string> { "Unified" },
-                    };
+                        newGroup = new GroupExtended
+                        {
+                            DisplayName = displayName,
+                            Description = description,
+                            MailNickname = mailNickname,
+                            MailEnabled = true,
+                            SecurityEnabled = false,
+                            Visibility = isPrivate == true ? "Private" : "Public",
+                            GroupTypes = new List<string> { "Unified" },
+                            PreferredDataLocation = preferredDataLocation,
+                        };
+                    }
+                    else
+                    {
+                        newGroup = new GroupExtended
+                        {
+                            DisplayName = displayName,
+                            Description = description,
+                            MailNickname = mailNickname,
+                            MailEnabled = true,
+                            SecurityEnabled = false,
+                            Visibility = isPrivate == true ? "Private" : "Public",
+                            GroupTypes = new List<string> { "Unified" },
+                        };
+                    }
+
 
                     if (owners != null && owners.Length > 0)
                     {
@@ -202,6 +223,7 @@ namespace OfficeDevPnP.Core.Framework.Graph
                             group.GroupId = addedGroup.Id;
                             group.Mail = addedGroup.Mail;
                             group.MailNickname = addedGroup.MailNickname;
+                            group.PreferredDataLocation = addedGroup.PreferredDataLocation;
 
                             int imageRetryCount = retryCount;
 
@@ -600,7 +622,7 @@ namespace OfficeDevPnP.Core.Framework.Graph
         /// <returns>The just created Office 365 Group</returns>
         public static UnifiedGroupEntity CreateUnifiedGroup(string displayName, string description, string mailNickname,
             string accessToken, string[] owners = null, string[] members = null, String groupLogoPath = null,
-            bool isPrivate = false, bool createTeam = false, int retryCount = 10, int delay = 500)
+            bool isPrivate = false, bool createTeam = false, int retryCount = 10, int delay = 500, string preferredDataLocation = "")
         {
             if (!String.IsNullOrEmpty(groupLogoPath) && !System.IO.File.Exists(groupLogoPath))
             {
@@ -613,7 +635,7 @@ namespace OfficeDevPnP.Core.Framework.Graph
                     return (CreateUnifiedGroup(displayName, description,
                         mailNickname, accessToken, owners, members,
                         groupLogo: groupLogoStream, isPrivate: isPrivate,
-                        createTeam: createTeam, retryCount: retryCount, delay: delay));
+                        createTeam: createTeam, retryCount: retryCount, delay: delay, preferredDataLocation: preferredDataLocation));
                 }
             }
             else
@@ -621,7 +643,7 @@ namespace OfficeDevPnP.Core.Framework.Graph
                 return (CreateUnifiedGroup(displayName, description,
                     mailNickname, accessToken, owners, members,
                     groupLogo: null, isPrivate: isPrivate,
-                    createTeam: createTeam, retryCount: retryCount, delay: delay));
+                    createTeam: createTeam, retryCount: retryCount, delay: delay, preferredDataLocation: preferredDataLocation));
             }
         }
 
@@ -641,7 +663,7 @@ namespace OfficeDevPnP.Core.Framework.Graph
         /// <returns>The just created Office 365 Group</returns>
         public static UnifiedGroupEntity CreateUnifiedGroup(string displayName, string description, string mailNickname,
             string accessToken, string[] owners = null, string[] members = null,
-            bool isPrivate = false, bool createTeam = false, int retryCount = 10, int delay = 500)
+            bool isPrivate = false, bool createTeam = false, int retryCount = 10, int delay = 500, string preferredDataLocation = "")
         {
             return (CreateUnifiedGroup(displayName, description,
                 mailNickname, accessToken, owners, members,
